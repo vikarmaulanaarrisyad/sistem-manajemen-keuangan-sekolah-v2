@@ -151,30 +151,56 @@
                     </li>
                 @endif
                 @if (Auth::user()->hasRole('guru'))
-                    <li class="nav-header">TRANSAKSI</li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fa fa-credit-card"></i>
-                            <p>
-                                Tabungan Siswa
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('setor.index') }}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Setor Tunai</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('tarik.index') }}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Tarik Tunai</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                    @can('read-tabungan-siswa')
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fa fa-credit-card"></i>
+                                <p>
+                                    Tabungan Siswa
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('setor.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Setor Tunai</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('tarik.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Tarik Tunai</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endcan
+                    @can('read-keuangan-sekolah')
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fa fa-money-check"></i>
+                                <p>
+                                    Keuangan Sekolah
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('pemasukan.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Pemasukan</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('tarik.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Pengeluaran</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endcan
                 @endif
             </ul>
         </nav>

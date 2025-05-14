@@ -9,6 +9,17 @@
     <li class="breadcrumb-item active">Tahun Pelajaran</li>
 @endsection
 
+@push('css')
+    <style>
+        .status-toggle {
+            border: none !important;
+            background: none !important;
+            outline: none !important;
+        }
+    </style>
+@endpush
+
+
 @section('content')
     <div class="row mt-3">
         <div class="col-lg-12">

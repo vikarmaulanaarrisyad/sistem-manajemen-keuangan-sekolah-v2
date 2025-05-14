@@ -36,6 +36,12 @@
     <link rel="stylesheet" href="{{ asset('AdminLTE/dist/css/adminlte.min.css?v=3.2.0') }}">
 
     <style>
+        .status-toggle {
+            border: none !important;
+            background: none !important;
+            outline: none !important;
+        }
+
         .swal-dropdown-below {
             top: auto !important;
             bottom: auto !important;
@@ -162,7 +168,6 @@
 
     <x-toast />
 
-    @stack('scripts')
     <script src="{{ asset('/sw.js') }}"></script>
     <script>
         if ("serviceWorker" in navigator) {
@@ -180,6 +185,9 @@
             console.error("Service workers are not supported.");
         }
     </script>
+
+    @stack('scripts')
+
 </body>
 
 </html>

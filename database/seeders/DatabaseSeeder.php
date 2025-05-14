@@ -29,10 +29,7 @@ class DatabaseSeeder extends Seeder
             KurikulumSeeder::class,
             KelasSeeder::class,
             UserSeeder::class,
-            GuruSeeder::class,
-            RombelSeeder::class,
             KewarganegaraanSeeder::class,
-            SiswaSeeder::class,
             SekolahSeeder::class,
         ]);
     }

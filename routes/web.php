@@ -7,6 +7,7 @@ use App\Http\Controllers\{
     KelasController,
     KenaikanSiswaController,
     KurikulumController,
+    PemasukanBosController,
     RombelController,
     SekolahController,
     SiswaController,
@@ -115,23 +116,33 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Role Guru
     Route::group(['middleware' => 'role:guru', 'prefix' => 'guru'], function () {
-        // Tabungan
-        Route::get('/tabungan/setor/data', [SetorTabunganController::class, 'data'])->name('setor.data');
-        Route::get('/tabungan/setor/getsiswa', [SetorTabunganController::class, 'getSiswa'])->name('setor.getSiswa');
-        Route::get('/tabungan/setor', [SetorTabunganController::class, 'index'])->name('setor.index');
-        Route::post('/tabungan/setor/simpan', [SetorTabunganController::class, 'store'])->name('setor.store');
-        Route::get('/tabungan/setor/{id}', [SetorTabunganController::class, 'show'])->name('setor.show');
-        Route::get('/tabungan/setor/{id}/pdf', [SetorTabunganController::class, 'PDF'])->name('setor.downloadPDF');
-        Route::put('/tabungan/setor/{id}', [SetorTabunganController::class, 'update'])->name('setor.update');
-        Route::delete('/tabungan/setor/{id}', [SetorTabunganController::class, 'destroy'])->name('setor.destroy');
+        Route::group(['middleware' => 'permission:read-tabungan-siswa'], function () {
+            // Tabungan
+            Route::get('/tabungan/setor/data', [SetorTabunganController::class, 'data'])->name('setor.data');
+            Route::get('/tabungan/setor/getsiswa', [SetorTabunganController::class, 'getSiswa'])->name('setor.getSiswa');
+            Route::get('/tabungan/setor', [SetorTabunganController::class, 'index'])->name('setor.index');
+            Route::post('/tabungan/setor/simpan', [SetorTabunganController::class, 'store'])->name('setor.store');
+            Route::get('/tabungan/setor/{id}', [SetorTabunganController::class, 'show'])->name('setor.show');
+            Route::get('/tabungan/setor/{id}/pdf', [SetorTabunganController::class, 'PDF'])->name('setor.downloadPDF');
+            Route::put('/tabungan/setor/{id}', [SetorTabunganController::class, 'update'])->name('setor.update');
+            Route::delete('/tabungan/setor/{id}', [SetorTabunganController::class, 'destroy'])->name('setor.destroy');
 
-        Route::get('/tabungan/tarik/data', [TarikTabunganController::class, 'data'])->name('tarik.data');
-        Route::get('/tabungan/tarik/getsiswa', [TarikTabunganController::class, 'getSiswa'])->name('tarik.getSiswa');
-        Route::get('/tabungan/tarik', [TarikTabunganController::class, 'index'])->name('tarik.index');
-        Route::post('/tabungan/tarik/simpan', [TarikTabunganController::class, 'store'])->name('tarik.store');
-        Route::get('/tabungan/tarik/{id}', [TarikTabunganController::class, 'show'])->name('tarik.show');
-        Route::get('/tabungan/tarik/{id}/pdf', [TarikTabunganController::class, 'PDF'])->name('tarik.downloadPDF');
-        Route::put('/tabungan/tarik/{id}', [TarikTabunganController::class, 'update'])->name('tarik.update');
-        Route::delete('/tabungan/tarik/{id}', [TarikTabunganController::class, 'destroy'])->name('tarik.destroy');
+            Route::get('/tabungan/tarik/data', [TarikTabunganController::class, 'data'])->name('tarik.data');
+            Route::get('/tabungan/tarik/getsiswa', [TarikTabunganController::class, 'getSiswa'])->name('tarik.getSiswa');
+            Route::get('/tabungan/tarik', [TarikTabunganController::class, 'index'])->name('tarik.index');
+            Route::post('/tabungan/tarik/simpan', [TarikTabunganController::class, 'store'])->name('tarik.store');
+            Route::get('/tabungan/tarik/{id}', [TarikTabunganController::class, 'show'])->name('tarik.show');
+            Route::get('/tabungan/tarik/{id}/pdf', [TarikTabunganController::class, 'PDF'])->name('tarik.downloadPDF');
+            Route::put('/tabungan/tarik/{id}', [TarikTabunganController::class, 'update'])->name('tarik.update');
+            Route::delete('/tabungan/tarik/{id}', [TarikTabunganController::class, 'destroy'])->name('tarik.destroy');
+        });
+
+        // Pemasukan (hanya jika punya permission)
+        Route::group(['middleware' => 'permission:read-keuangan-sekolah'], function () {
+            Route::get('/pemasukan/data', [PemasukanBosController::class, 'data'])->name('pemasukan.data');
+            Route::get('/pemasukan/get-siswa', [PemasukanBosController::class, 'getSiswa'])->name('pemasukan.getSiswa');
+            Route::put('/pemasukan/update-status/{id}', [PemasukanBosController::class, 'updateStatus'])->name('pemasukan.update_status');
+            Route::resource('/pemasukan', PemasukanBosController::class);
+        });
     });
 });

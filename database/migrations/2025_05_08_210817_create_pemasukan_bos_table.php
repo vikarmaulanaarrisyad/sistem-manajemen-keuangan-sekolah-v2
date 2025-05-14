@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('tanggal_terima');
             $table->unsignedBigInteger('tahun_pelajaran_id');
             $table->string('keterangan')->nullable();
+            $table->integer('status')->default(0); // 1 : aktif, 0 : tidak aktif
             $table->timestamps();
         });
     }

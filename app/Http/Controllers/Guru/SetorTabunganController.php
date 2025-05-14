@@ -140,7 +140,7 @@ class SetorTabunganController extends Controller
         $validator = Validator::make($request->all(), [
             'peserta_didik_id' => 'required',
             'tanggal' => 'required',
-            'jumlah' => 'required',
+            'jumlah' => 'required|regex:/^[0-9.]+$/',
         ]);
 
         if ($validator->fails()) {

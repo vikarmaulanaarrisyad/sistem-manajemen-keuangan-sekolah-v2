@@ -84,7 +84,7 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-6">
             <x-card>
                 <x-slot name="header">
                     <h3 class="card-title">Daftar Saldo per Siswa</h3>
@@ -92,6 +92,7 @@
                 <table id="saldoPerSiswaTable" class="table table-bordered table-striped">
                     <thead>
                         <tr>
+                            <th>No</th>
                             <th>Nama Siswa</th>
                             <th>Saldo</th>
                         </tr>
@@ -99,6 +100,7 @@
                     <tbody>
                         @foreach ($saldoPerSiswa as $siswa)
                             <tr>
+                                <td>{{ $loop->iteration }}</td>
                                 <td>{{ $siswa->nama_lengkap }}</td>
                                 <td>Rp {{ number_format($siswa->saldo ?? 0, 0, ',', '.') }}</td>
                             </tr>
@@ -109,6 +111,8 @@
         </div>
     </div>
 @endsection
+
+@include('includes.datatables')
 
 @push('scripts')
     <script>

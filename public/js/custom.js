@@ -165,7 +165,7 @@ function loopErrors(errors) {
     }
 }
 
-function format_uang(input) {
+function format_uang1(input) {
     a = input.value;
     if (a == undefined) {
         a = input.toString();
@@ -188,6 +188,25 @@ function format_uang(input) {
     }
 
     input.value = c;
+}
+
+function format_uang(input) {
+    // Ambil nilai string, bisa dari input HTML atau string biasa
+    let a = typeof input === "string" ? input : input.value || "";
+
+    // Hapus semua karakter kecuali angka
+    let b = a.replace(/[^\d]/g, "");
+
+    // Format angka dengan titik per 3 digit
+    let formatted = b.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    // Jika parameter adalah string, return hasilnya
+    if (typeof input === "string") {
+        return formatted;
+    }
+
+    // Jika parameter adalah elemen input, ubah nilainya langsung
+    input.value = formatted;
 }
 
 var url = window.location;

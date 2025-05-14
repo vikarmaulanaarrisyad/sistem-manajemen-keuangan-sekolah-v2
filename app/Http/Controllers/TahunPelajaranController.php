@@ -27,9 +27,9 @@ class TahunPelajaranController extends Controller
             ->editColumn('status', function ($q) {
                 $icon = $q->status ? 'fa-toggle-on text-success' : 'fa-toggle-off text-danger';
                 return '
-                <a href="#" onclick="updateStatus(' . $q->id . ')" class="status-toggle" kodeq="' . $q->id . '">
+                <button onclick="updateStatus(' . $q->id . ')" class="status-toggle btn-link" kodeq="' . $q->id . '">
                     <i class="fas ' . $icon . ' fa-lg"></i>
-                </a>
+                </button>
             ';
             })
             ->addColumn('aksi', function ($q) {
