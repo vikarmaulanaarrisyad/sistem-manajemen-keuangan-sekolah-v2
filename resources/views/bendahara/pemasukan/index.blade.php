@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Setor Tunai')
-@section('subtitle', 'Setor Tunai')
+@section('title', 'Pemasukan Keuangan Sekolah')
+@section('subtitle', 'Pemasukan Keuangan Sekolah')
 
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
@@ -202,7 +202,7 @@
             });
         });
 
-        function deleteData(url, siswa, tanggal, jumlah) {
+        function deleteData(url, nama, tanggal, jumlah) {
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success',
@@ -212,7 +212,7 @@
             })
             swalWithBootstrapButtons.fire({
                 title: 'Apakah anda yakin?',
-                text: 'Menghapus transaksi untuk siswa ' + siswa + ' tanggal ' + tanggal + ' dengan jumlah: ' +
+                text: 'Menghapus data untuk ' + nama + ' tanggal ' + tanggal + ' dengan jumlah: ' +
                     jumlah,
                 icon: 'warning',
                 showCancelButton: true,

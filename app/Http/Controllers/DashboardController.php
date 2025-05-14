@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Guru;
+use App\Models\PemasukanBos;
+use App\Models\PengeluaranBos;
 use App\Models\Rombel;
 use App\Models\Siswa;
 use App\Models\TransaksiTabungan;
@@ -205,6 +207,10 @@ class DashboardController extends Controller
             ->orderByRaw('YEAR(tanggal_transaksi)')
             ->get();
 
+        // Total Pemasukan
+        $totalPemasukan = PemasukanBos::where('tahun_pelajaran_id', $tahunPelajaran->id)->sum('jumlah');
+        $totalPengeluaran = PengeluaranBos::where('tahun_pelajaran_id', $tahunPelajaran->id)->sum('jumlah');
+
         // Jika admin login
         if ($user->hasRole('admin')) {
             $totalGuru = Guru::count();
@@ -264,7 +270,10 @@ class DashboardController extends Controller
             'jumlahSiswaDiajar',
             'tabunganPerBulan',
             'tabunganPerTahun',
-            'saldoPerSiswa'
+            'saldoPerSiswa',
+            'totalPemasukan',
+            'tahunPelajaran',
+            'totalPengeluaran'
         ));
     }
 }

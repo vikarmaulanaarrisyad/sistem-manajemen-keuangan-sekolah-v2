@@ -34,8 +34,12 @@ class PemasukanBosController extends Controller
                 </button>
             ';
             })
-            ->editColumn('aksi', function () {
-                return '';
+            ->addColumn('aksi', function ($q) {
+                return '
+                <button onclick="deleteData(`' . route('pemasukan.destroy', $q->id) . '`, `' . $q->sumber_dana . '`, `' . $q->tanggal_terima . '`, `' . $q->jumlah . '`)" class="btn btn-danger btn-sm">
+                    <i class="fa fa-trash"></i> Hapus
+                </button>
+            ';
             })
             ->escapeColumns([])
             ->make(true);
@@ -115,9 +119,23 @@ class PemasukanBosController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(PemasukanBos $pemasukanBos)
+    public function destroy($id)
     {
-        //
+        $pemasukan = PemasukanBos::findOrfail($id);
+        // Cek jika status == 1, maka tolak penghapusan
+        if ($pemasukan->status == '1') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data tidak bisa dihapus karena status telah dikunci.'
+            ], 403); // 403 Forbidden
+        }
+
+        $pemasukan->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data berhasil dihapus'
+        ], 200);
     }
 
     public function updateStatus($id)
