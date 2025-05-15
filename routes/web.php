@@ -8,6 +8,7 @@ use App\Http\Controllers\{
     KenaikanSiswaController,
     KurikulumController,
     PemasukanBosController,
+    PengeluaranBosController,
     RombelController,
     SekolahController,
     SiswaController,
@@ -143,6 +144,9 @@ Route::group(['middleware' => 'auth'], function () {
             Route::get('/pemasukan/get-siswa', [PemasukanBosController::class, 'getSiswa'])->name('pemasukan.getSiswa');
             Route::put('/pemasukan/update-status/{id}', [PemasukanBosController::class, 'updateStatus'])->name('pemasukan.update_status');
             Route::resource('/pemasukan', PemasukanBosController::class);
+
+            Route::get('/pengeluaran/data', [PengeluaranBosController::class, 'data'])->name('pengeluaran.data');
+            Route::resource('/pengeluaran', PengeluaranBosController::class);
         });
     });
 });

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pemasukan Keuangan Sekolah')
-@section('subtitle', 'Pemasukan Keuangan Sekolah')
+@section('title', 'Pengeluaran Keuangan Sekolah')
+@section('subtitle', 'Pengeluaran Keuangan Sekolah')
 
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
@@ -21,21 +21,17 @@
                 <div class="row">
                     <div class="col-md-4">
                         <x-card>
-                            <x-slot name="header">Tambah Pemasukan Keuangan Sekolah</x-slot>
-                            <form id="formPemasukan">
+                            <x-slot name="header">Tambah Pengeluaran Keuangan Sekolah</x-slot>
+                            <form id="formPengeluaran">
                                 @csrf
                                 <div class="form-group">
-                                    <label for="nama_sumber">Sumber Dana</label>
-                                    <input id="nama_sumber" class="form-control" type="text" name="nama_sumber"
-                                        autocomplete="off">
-                                </div>
-                                <div class="form-group">
                                     <label>Tanggal Diterima</label>
-                                    <div class="input-group datepicker" id="tanggal_terima" data-target-input="nearest">
-                                        <input type="text" name="tanggal_terima"
-                                            class="form-control datetimepicker-input" data-target="#tanggal_terima"
+                                    <div class="input-group datepicker" id="tanggal_pengeluaran"
+                                        data-target-input="nearest">
+                                        <input type="text" name="tanggal_pengeluaran"
+                                            class="form-control datetimepicker-input" data-target="#tanggal_pengeluaran"
                                             data-toggle="datetimepicker" autocomplete="off" />
-                                        <div class="input-group-append" data-target="#tanggal_terima"
+                                        <div class="input-group-append" data-target="#tanggal_pengeluaran"
                                             data-toggle="datetimepicker">
                                             <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                         </div>
@@ -47,8 +43,8 @@
                                         autocapitalize="off">
                                 </div>
                                 <div class="form-group">
-                                    <label>Keterangan</label>
-                                    <textarea class="form-control" name="keterangan" autocapitalize="off">-</textarea>
+                                    <label>Uraian Kegiatan</label>
+                                    <textarea class="form-control" name="uraian" autocapitalize="off">-</textarea>
                                 </div>
                                 <button type="submit" class="btn btn-success" id="btnSimpan">SIMPAN</button>
                             </form>
@@ -59,21 +55,17 @@
                         <x-card>
                             <x-slot name="header">Rekap Data Pemasukan</x-slot>
                             <div class="table-responsive">
-                                <table class="table table-bordered" id="tablePemasukan">
-                                    <thead>
+                                <x-table id="tablePengeluaran">
+                                    <x-slot name="thead">
                                         <tr>
                                             <th>No.</th>
                                             <th>Tanggal</th>
-                                            <th>Sumber Dana</th>
+                                            <th>Uraian</th>
                                             <th>Jumlah</th>
-                                            <th>Keterangan</th>
-                                            <th>Status</th>
                                             <th>Aksi</th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                                    </x-slot>
+                                </x-table>
                             </div>
                         </x-card>
                     </div>
@@ -90,12 +82,12 @@
 @push('scripts')
     <script>
         let table;
-        table = $('#tablePemasukan').DataTable({
+        table = $('#tablePengeluaran').DataTable({
             processing: true,
             serverSide: true,
             lengthChange: false,
             searching: false,
-            ajax: "{{ route('pemasukan.data') }}",
+            ajax: "{{ route('pengeluaran.data') }}",
             columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
@@ -103,25 +95,17 @@
                     searchable: false
                 },
                 {
-                    data: 'tanggal_terima',
-                    name: 'tanggal_terima'
+                    data: 'tanggal_pengeluaran',
+                    name: 'tanggal_pengeluaran'
                 },
                 {
-                    data: 'nama_sumber',
-                    name: 'nama_sumber'
+                    data: 'uraian',
+                    name: 'uraian'
                 },
                 {
                     data: 'jumlah',
                     name: 'jumlah',
                     className: 'text-right', // Mengatur agar data berada di posisi kanan
-                },
-                {
-                    data: 'keterangan',
-                    name: 'keterangan'
-                },
-                {
-                    data: 'status',
-                    name: 'status'
                 },
                 {
                     data: 'aksi',
@@ -133,7 +117,7 @@
         });
 
         // fungsi submit
-        $('#formPemasukan').on('submit', function(e) {
+        $('#formPengeluaran').on('submit', function(e) {
             e.preventDefault();
             let formData = $(this).serialize();
 
@@ -146,7 +130,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "{{ route('pemasukan.store') }}",
+                        url: "{{ route('pengeluaran.store') }}",
                         method: "POST",
                         data: formData,
                         success: function(response, textStatus, xhr) {
@@ -160,14 +144,14 @@
                                 }).then(() => {
                                     table.ajax.reload();
                                     // Clear the form inputs
-                                    $('#formPemasukan')[0].reset();
+                                    $('#formPengeluaran')[0].reset();
 
                                     // Bersihkan class is-invalid tapi jangan hapus elemen feedback-nya
-                                    $('#formPemasukan .is-invalid').removeClass(
+                                    $('#formPengeluaran .is-invalid').removeClass(
                                         'is-invalid');
 
                                     // Opsional: kosongkan isi feedback jika perlu
-                                    $('#formPemasukan .invalid-feedback').text('');
+                                    $('#formPengeluaran .invalid-feedback').text('');
                                 });
                             }
                         },
@@ -237,7 +221,7 @@
                                 }).then(() => {
                                     table.ajax.reload();
                                     // Clear the form inputs
-                                    $('#formPemasukan')[0].reset();
+                                    $('#formPengeluaran')[0].reset();
                                 });
                             }
                         },

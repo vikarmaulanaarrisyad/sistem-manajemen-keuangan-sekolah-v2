@@ -193,7 +193,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('tarik.index') }}" class="nav-link">
+                                    <a href="{{ route('pengeluaran.index') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Pengeluaran</p>
                                     </a>
