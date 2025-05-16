@@ -152,7 +152,7 @@ Route::group(['middleware' => 'auth'], function () {
     });
 
     // Role Guru
-    Route::group(['middleware' => 'role:guru', 'prefix' => 'guru'], function () {
+    Route::group(['middleware' => 'role:guru|bendahara', 'prefix' => 'guru'], function () {
         Route::group(['middleware' => 'permission:read-tabungan-siswa'], function () {
             // Tabungan
             Route::get('/tabungan/setor/data', [SetorTabunganController::class, 'data'])->name('setor.data');

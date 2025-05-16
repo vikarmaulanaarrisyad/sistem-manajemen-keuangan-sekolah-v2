@@ -68,6 +68,41 @@
         </div>
     </div>
 
+    @can('read-keuangan-sekolah')
+        <div class="row">
+            <div class="col-lg-6 col-6">
+                <!-- small box -->
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>Rp {{ format_uang($totalPemasukan) }}<sup style="font-size: 20px"></sup></h3>
+
+                        <p>Pemasukan Dana Bos Tahun Pelajaran {{ $tahunPelajaran->nama }} {{ $tahunPelajaran->semester->nama }}
+                        </p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-stats-bars"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-6">
+                <!-- small box -->
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>Rp {{ format_uang($totalPengeluaran) }}</h3>
+
+                        <p>Pengeluaran Dana Bos Tahun Pelajaran {{ $tahunPelajaran->nama }}
+                            {{ $tahunPelajaran->semester->nama }}</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-pie-graph"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- ./col -->
+        </div>
+    @endcan
+
     {{--  <div class="row">
         <div class="col-md-6">
             <div class="card">

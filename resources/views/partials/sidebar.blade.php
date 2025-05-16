@@ -201,7 +201,7 @@
                         </a>
                     </li>
                 @endif
-                @if (Auth::user()->hasRole('guru'))
+                @if (Auth::user()->hasRole('guru') || Auth::user()->hasRole('bendahara'))
                     @can('read-tabungan-siswa')
                         <li class="nav-item">
                             <a href="#" class="nav-link">

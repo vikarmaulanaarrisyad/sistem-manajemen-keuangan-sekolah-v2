@@ -231,7 +231,10 @@ class DashboardController extends Controller
                 'totalSetor',
                 'totalTarik',
                 'tabunganPerBulan',
-                'tabunganPerTahun'
+                'tabunganPerTahun',
+                'totalPemasukan',
+                'totalPengeluaran',
+                'tahunPelajaran',
             ));
         }
 
