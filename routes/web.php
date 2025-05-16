@@ -118,7 +118,6 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('users/reset-password/{id}', [UserController::class, 'resetPassword'])->name('users.resetPassword');
         Route::resource('/users', UserController::class);
 
-
         // Role
         Route::controller(RoleController::class)->group(function () {
             Route::get('/role/data', 'data')->name('role.data');

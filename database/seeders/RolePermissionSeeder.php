@@ -14,6 +14,7 @@ class RolePermissionSeeder extends Seeder
         $admin = Role::firstOrCreate(['name' => 'admin']);
         $guru = Role::firstOrCreate(['name' => 'guru']);
         $bendahara = Role::firstOrCreate(['name' => 'bendahara']);
+        $siswa = Role::firstOrCreate(['name' => 'siswa']);
 
         // Mapping fitur ke nama group permission
         $featureGroups = [

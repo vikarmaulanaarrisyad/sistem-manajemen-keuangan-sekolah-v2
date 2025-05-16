@@ -15,174 +15,6 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index1()
-    {
-        $user = Auth::user();
-        $tahunPelajaran = TahunPelajaran::aktif()->first();
-
-        $guru = Guru::count();
-        $siswa = Siswa::aktif()->count();
-        $kurikulum = $tahunPelajaran?->kurikulum()->count() ?? 0;
-        $rombel = $tahunPelajaran?->rombel()->count() ?? 0;
-
-        // Hitung siswa laki-laki dan perempuan
-        $siswaLaki = Siswa::aktif()->whereHas('jenis_kelamin', function ($query) {
-            $query->where('nama', 'Laki-laki');
-        })->count();
-
-        $siswaPerempuan  = Siswa::aktif()->whereHas('jenis_kelamin', function ($query) {
-            $query->where('nama', 'Perempuan');
-        })->count();
-
-        // Hitung total setor dan tarik tunai
-        $totalSetor = TransaksiTabungan::where('jenis_transaksi', 'setor')->sum('jumlah');
-        $totalTarik = TransaksiTabungan::where('jenis_transaksi', 'tarik')->sum('jumlah');
-
-        if ($user->hasRole('admin')) {
-            return view('dashboard.index', compact(
-                'guru',
-                'siswa',
-                'rombel',
-                'kurikulum',
-                'siswaLaki',
-                'siswaPerempuan',
-                'totalSetor',
-                'totalTarik'
-            ));
-        } else {
-            // Guru yang login
-            $guru = Guru::where('user_id', $user->id)->first();
-
-            // Ambil semua rombel yang diajar guru dari pivot guru_rombel
-            $rombels = Rombel::where('wali_kelas_id', $guru->id)
-                ->where('tahun_pelajaran_id', $tahunPelajaran->id)
-                ->pluck('id'); // Ambil semua id rombel dalam array
-
-            // Hitung jumlah siswa unik yang diajar guru
-            $jumlahSiswaDiajar = 0;
-            if ($rombels->isNotEmpty()) {
-                $jumlahSiswaDiajar = DB::table('siswa_rombel')
-                    ->whereIn('rombel_id', $rombels)
-                    ->where('tahun_pelajaran_id', $tahunPelajaran->id)
-                    ->distinct('siswa_id')
-                    ->count('siswa_id');
-            }
-
-            return view('guru.dashboard.index', compact(
-                'totalSetor',
-                'totalTarik',
-                'jumlahSiswaDiajar'
-            ));
-        }
-    }
-
-    public function index2()
-    {
-        $user = Auth::user();
-        $tahunPelajaran = TahunPelajaran::aktif()->first();
-
-        $guru = Guru::count();
-        $siswa = Siswa::aktif()->count();
-        $kurikulum = $tahunPelajaran?->kurikulum()->count() ?? 0;
-        $rombel = $tahunPelajaran?->rombel()->count() ?? 0;
-
-        // Hitung siswa laki-laki dan perempuan
-        $siswaLaki = Siswa::aktif()->whereHas('jenis_kelamin', function ($query) {
-            $query->where('nama', 'Laki-laki');
-        })->count();
-
-        $siswaPerempuan  = Siswa::aktif()->whereHas('jenis_kelamin', function ($query) {
-            $query->where('nama', 'Perempuan');
-        })->count();
-
-        // Hitung total setor dan tarik tunai
-        $totalSetor = TransaksiTabungan::where('jenis_transaksi', 'setor')->sum('jumlah');
-        $totalTarik = TransaksiTabungan::where('jenis_transaksi', 'tarik')->sum('jumlah');
-
-        // Grafik Tabungan Per Bulan
-        $tabunganPerBulan = TransaksiTabungan::select(DB::raw('MONTH(tanggal_transaksi) as bulan'), DB::raw('SUM(jumlah) as total_setor'))
-            ->where('jenis_transaksi', 'setor')
-            ->whereYear('tanggal_transaksi', Carbon::now()->year)
-            ->groupBy(DB::raw('MONTH(tanggal_transaksi)'))
-            ->orderBy(DB::raw('MONTH(tanggal_transaksi)'))
-            ->get();
-
-        // Grafik Tabungan Per Tahun
-        $tabunganPerTahun = TransaksiTabungan::select(DB::raw('YEAR(tanggal_transaksi) as tahun'), DB::raw('SUM(jumlah) as total_setor'))
-            ->where('jenis_transaksi', 'setor')
-            ->groupBy(DB::raw('YEAR(tanggal_transaksi)'))
-            ->orderBy(DB::raw('YEAR(tanggal_transaksi)'))
-            ->get();
-
-        // Ambil guru yang login
-        $guru = Guru::where('user_id', $user->id)->first();
-
-        // Ambil semua rombel yang diajar guru
-        $rombels = Rombel::where('wali_kelas_id', $guru->id)
-            ->where('tahun_pelajaran_id', $tahunPelajaran->id)
-            ->pluck('id'); // array of rombel_id
-
-        // Ambil siswa yang terdaftar di salah satu rombel tsb
-        $saldoPerSiswa = Siswa::whereHas('siswa_rombel', function ($query) use ($rombels) {
-            $query->whereIn('rombels.id', $rombels);
-        })
-            ->aktif()
-            ->withSum(['tabungan as total_setor' => function ($query) {
-                $query->where('jenis_transaksi', 'setor');
-            }], 'jumlah')
-            ->withSum(['tabungan as total_tarik' => function ($query) {
-                $query->where('jenis_transaksi', 'tarik');
-            }], 'jumlah')
-            ->get()
-            ->map(function ($siswa) {
-                // Hitung saldo dari total setor - total tarik
-                $siswa->saldo = ($siswa->total_setor ?? 0) - ($siswa->total_tarik ?? 0);
-                return $siswa;
-            });
-
-        if ($user->hasRole('admin')) {
-            return view('admin.dashboard.index', compact(
-                'guru',
-                'siswa',
-                'rombel',
-                'kurikulum',
-                'siswaLaki',
-                'siswaPerempuan',
-                'totalSetor',
-                'totalTarik',
-                'tabunganPerBulan',
-                'tabunganPerTahun'
-            ));
-        } else {
-            // Guru yang login
-            $guru = Guru::where('user_id', $user->id)->first();
-
-            // Ambil semua rombel yang diajar guru dari pivot guru_rombel
-            $rombels = Rombel::where('wali_kelas_id', $guru->id)
-                ->where('tahun_pelajaran_id', $tahunPelajaran->id)
-                ->pluck('id'); // Ambil semua id rombel dalam array
-
-            // Hitung jumlah siswa unik yang diajar guru
-            $jumlahSiswaDiajar = 0;
-            if ($rombels->isNotEmpty()) {
-                $jumlahSiswaDiajar = DB::table('siswa_rombel')
-                    ->whereIn('rombel_id', $rombels)
-                    ->where('tahun_pelajaran_id', $tahunPelajaran->id)
-                    ->distinct('siswa_id')
-                    ->count('siswa_id');
-            }
-
-            return view('guru.dashboard.index', compact(
-                'totalSetor',
-                'totalTarik',
-                'jumlahSiswaDiajar',
-                'tabunganPerBulan',
-                'tabunganPerTahun',
-                'saldoPerSiswa'
-            ));
-        }
-    }
-
     public function index()
     {
         $user = Auth::user();
@@ -237,6 +69,33 @@ class DashboardController extends Controller
                 'tahunPelajaran',
             ));
         }
+
+        // Jika siswa login
+        if ($user->hasRole('siswa')) {
+            $siswa = Siswa::where('user_id', $user->id)->first();
+
+            if ($siswa) {
+                $totalSetorSiswa = TransaksiTabungan::where('siswa_id', $siswa->id)
+                    ->where('jenis_transaksi', 'setor')
+                    ->sum('jumlah');
+
+                $totalTarikSiswa = TransaksiTabungan::where('siswa_id', $siswa->id)
+                    ->where('jenis_transaksi', 'tarik')
+                    ->sum('jumlah');
+
+                $saldoSiswa = $totalSetorSiswa - $totalTarikSiswa;
+
+                return view('siswa.dashboard.index', compact(
+                    'totalSetorSiswa',
+                    'totalTarikSiswa',
+                    'saldoSiswa'
+                ));
+            }
+
+            // Jika data siswa tidak ditemukan
+            return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
+        }
+
 
         // Jika guru login
         $guruLogin = Guru::where('user_id', $user->id)->first();

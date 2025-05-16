@@ -6,16 +6,15 @@ use App\Models\Agama;
 use App\Models\JenisKelamin;
 use App\Models\OrangTua;
 use App\Models\Siswa;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
-
 
 class SiswaImport implements ToModel, WithHeadingRow
 {
-
     public function model(array $row)
     {
         if (empty($row['nama_lengkap']) || empty($row['tanggal_lahir_yyyy_mm_dd']) || empty($row['agama']) || empty($row['jenis_kelamin'])) {
@@ -40,7 +39,6 @@ class SiswaImport implements ToModel, WithHeadingRow
         $nisn = !empty($row['nisn']) ? $row['nisn'] : 0; // Jika NISN kosong/null, set ke 0
 
         if ($nisn != 0) {
-            // Jika NISN tidak 0, cari berdasarkan NISN dan NIS
             $siswa = Siswa::updateOrCreate(
                 ['nisn' => $nisn, 'nis' => $row['nis']],
                 [
@@ -60,11 +58,10 @@ class SiswaImport implements ToModel, WithHeadingRow
                 ]
             );
         } else {
-            // Jika NISN = 0 atau NULL, cari berdasarkan hanya NIS dan tetap set NISN = 0
             $siswa = Siswa::updateOrCreate(
                 ['nis' => $row['nis']],
                 [
-                    'nisn' => 0, // Pastikan NISN tetap 0
+                    'nisn' => 0,
                     'nama_lengkap' => $row['nama_lengkap'] ?? '',
                     'nama_panggilan' => $row['nama_panggilan'] ?? '',
                     'nik' => $row['nik'] ?? null,
@@ -82,10 +79,32 @@ class SiswaImport implements ToModel, WithHeadingRow
             );
         }
 
+        // === Buat akun user ===
+        $email = !empty($row['email']) ? $row['email'] : 'siswa' . $nisn . '@mail.com';
+        $username = $nisn;
 
+        $user = User::updateOrCreate(
+            ['username' => $username],
+            [
+                'name' => $row['nama_lengkap'] ?? '',
+                'email' => $email,
+                'username' => $username,
+                'password' => Hash::make('password123'), // default password
+            ]
+        );
+
+        // Tambah role siswa jika belum
+        if (!$user->hasRole('siswa')) {
+            $user->assignRole('siswa');
+        }
+
+        // Set user_id ke siswa
+        $siswa->user_id = $user->id;
+        $siswa->save();
+
+        // === Proses data orang tua ===
         $this->prosesDataOrangTua($siswa->id, $row);
     }
-
 
     /**
      * Proses data orang tua atau wali
@@ -131,7 +150,7 @@ class SiswaImport implements ToModel, WithHeadingRow
     private function convertExcelDateToDate($excelDate)
     {
         if (!$excelDate || !is_numeric($excelDate)) {
-            return null; // Jika kosong atau bukan angka, return null
+            return null;
         }
 
         return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($excelDate)->format('Y-m-d');
