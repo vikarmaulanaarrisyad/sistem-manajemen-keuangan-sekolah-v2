@@ -9,6 +9,9 @@ use App\Http\Controllers\{
     KurikulumController,
     PemasukanBosController,
     PengeluaranBosController,
+    PermissionController,
+    PermissionGroupController,
+    RoleController,
     RombelController,
     SekolahController,
     SiswaController,
@@ -111,8 +114,41 @@ Route::group(['middleware' => 'auth'], function () {
 
         // Manajemen User
         Route::get('/users/data', [UserController::class, 'data'])->name('users.data');
+        Route::get('/users/role_search', [UserController::class, 'roleSearch'])->name('users.role_search');
         Route::post('users/reset-password/{id}', [UserController::class, 'resetPassword'])->name('users.resetPassword');
         Route::resource('/users', UserController::class);
+
+
+        // Role
+        Route::controller(RoleController::class)->group(function () {
+            Route::get('/role/data', 'data')->name('role.data');
+            Route::get('/role', 'index')->name('role.index');
+            Route::get('/role/{role}/detail', 'detail')->name('role.detail');
+            Route::get('/role/{role}', 'edit')->name('role.edit');
+            Route::put('/role/{role}/update', 'update')->name('role.update');
+            Route::post('/role', 'store')->name('role.store');
+            Route::delete('/role/{role}/destroy', 'destroy')->name('role.destroy');
+        });
+
+        Route::controller(PermissionController::class)->group(function () {
+            Route::get('/permissions/data', 'data')->name('permission.data');
+            Route::get('/permissions', 'index')->name('permission.index');
+            Route::get('/permissions/{permission}/detail', 'detail')->name('permission.detail');
+            Route::get('/permissions/{permission}', 'edit')->name('permission.edit');
+            Route::put('/permissions/{permission}/update', 'update')->name('permission.update');
+            Route::post('/permissions', 'store')->name('permission.store');
+            Route::delete('/permissions/{permission}/destroy', 'destroy')->name('permission.destroy');
+        });
+
+        Route::controller(PermissionGroupController::class)->group(function () {
+            Route::get('/permissiongroups/data', 'data')->name('permissiongroups.data');
+            Route::get('/permissiongroups', 'index')->name('permissiongroups.index');
+            Route::get('/permissiongroups/{permissionGroup}/detail', 'detail')->name('permissiongroups.detail');
+            Route::get('/permissiongroups/{permissionGroup}', 'edit')->name('permissiongroups.edit');
+            Route::put('/permissiongroups/{permissionGroup}/update', 'update')->name('permissiongroups.update');
+            Route::post('/permissiongroups', 'store')->name('permissiongroups.store');
+            Route::delete('/permissiongroups/{permissionGroup}/destroy', 'destroy')->name('permissiongroups.destroy');
+        });
     });
 
     // Role Guru

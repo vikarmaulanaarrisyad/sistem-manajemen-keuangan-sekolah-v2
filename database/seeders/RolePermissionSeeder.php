@@ -2,82 +2,71 @@
 
 namespace Database\Seeders;
 
+use App\Models\PermissionGroup;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 class RolePermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Buat peran (roles)
         $admin = Role::firstOrCreate(['name' => 'admin']);
         $guru = Role::firstOrCreate(['name' => 'guru']);
         $bendahara = Role::firstOrCreate(['name' => 'bendahara']);
 
-        // Daftar fitur dan operasi CRUD
-        $features = [
-            'tahun-pelajaran',
-            'kurikulum',
-            'gtk',
-            'siswa',
-            'rombel',
-            'tabungan-siswa',
-            'keuangan-sekolah',
+        // Mapping fitur ke nama group permission
+        $featureGroups = [
+            'tahun-pelajaran'   => 'Tahun Pelajaran',
+            'kurikulum'         => 'Kurikulum',
+            'gtk'               => 'GTK',
+            'kelas'               => 'Kelas',
+            'siswa'             => 'Siswa',
+            'rombel'            => 'Rombel',
+            'tabungan-siswa'    => 'Tabungan',
+            'keuangan-sekolah'  => 'Keuangan',
         ];
 
         $operations = ['create', 'read', 'update', 'delete'];
-
         $permissions = [];
 
-        // Generate permissions untuk setiap fitur
-        foreach ($features as $feature) {
+        foreach ($featureGroups as $feature => $groupName) {
+            $group = PermissionGroup::where('name', $groupName)->first();
+
+            if (!$group) {
+                // Jika group belum ada, skip atau buat baru (optional)
+                $group = PermissionGroup::create(['name' => $groupName]);
+            }
+
             foreach ($operations as $operation) {
-                $permissions[] = "{$operation}-{$feature}";
+                $name = "{$operation}-{$feature}";
+
+                $permission = Permission::firstOrCreate(
+                    ['name' => $name],
+                    ['permission_group_id' => $group->id]
+                );
+
+                // Update jika belum disetel permission_group_id-nya
+                if ($permission->permission_group_id !== $group->id) {
+                    $permission->permission_group_id = $group->id;
+                    $permission->save();
+                }
+
+                $permissions[] = $permission->name;
             }
         }
 
-        // Buat permission di database
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
-        }
-
-        // Assign permission ke masing-masing role
-
-        // Admin: full access
+        // Assign permissions to roles
         $admin->syncPermissions($permissions);
 
-        // Guru: akses terbatas
         $guruPermissions = [
-            'read-tahun-pelajaran',
-            'read-kurikulum',
-            'read-gtk',
-            'read-siswa',
-            'read-rombel',
             'read-tabungan-siswa',
             'create-tabungan-siswa',
             'read-keuangan-sekolah',
         ];
         $guru->syncPermissions($guruPermissions);
 
-        // Bendahara: fokus ke tabungan & keuangan
         $bendaharaPermissions = [
-            'read-tahun-pelajaran',
-            'read-kurikulum',
-            'read-gtk',
-            'read-siswa',
-            'read-rombel',
-
-            // Full akses tabungan siswa
-            'create-tabungan-siswa',
-            'read-tabungan-siswa',
-            'update-tabungan-siswa',
-            'delete-tabungan-siswa',
-
-            // Full akses keuangan sekolah
             'create-keuangan-sekolah',
             'read-keuangan-sekolah',
             'update-keuangan-sekolah',

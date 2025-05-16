@@ -48,44 +48,58 @@
                 </li>
                 @if (Auth::user()->hasRole('admin'))
                     <li class="nav-header">MASTER DATA</li>
-                    <li class="nav-item">
-                        <a href="{{ route('tahunpelajaran.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-calendar-alt"></i>
-                            <p>
-                                Tahun Pelajaran
-                            </p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('kurikulum.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-book-open"></i>
-                            <p>Kurikulum</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('guru.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-user-friends"></i>
-                            <p>
-                                GTK
-                            </p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('kelas.index') }}" class="nav-link">
-                            <i class="nav-icon fab fa-instalod"></i>
-                            <p>
-                                Kelas
-                            </p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('siswa.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-user-graduate"></i>
-                            <p>
-                                Siswa
-                            </p>
-                        </a>
-                    </li>
+                    @can('read-tahun-pelajaran')
+                        <li class="nav-item">
+                            <a href="{{ route('tahunpelajaran.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-calendar-alt"></i>
+                                <p>
+                                    Tahun Pelajaran
+                                </p>
+                            </a>
+                        </li>
+                    @endcan
+
+                    @can('read-kurikulum')
+                        <li class="nav-item">
+                            <a href="{{ route('kurikulum.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-book-open"></i>
+                                <p>Kurikulum</p>
+                            </a>
+                        </li>
+                    @endcan
+
+                    @can('read-gtk')
+                        <li class="nav-item">
+                            <a href="{{ route('guru.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-user-friends"></i>
+                                <p>
+                                    GTK
+                                </p>
+                            </a>
+                        </li>
+                    @endcan
+
+                    @can('read-kelas')
+                        <li class="nav-item">
+                            <a href="{{ route('kelas.index') }}" class="nav-link">
+                                <i class="nav-icon fab fa-instalod"></i>
+                                <p>
+                                    Kelas
+                                </p>
+                            </a>
+                        </li>
+                    @endcan
+
+                    @can('read-kelas')
+                        <li class="nav-item">
+                            <a href="{{ route('siswa.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-user-graduate"></i>
+                                <p>
+                                    Siswa
+                                </p>
+                            </a>
+                        </li>
+                    @endcan
 
                     @php
                         // Ambil tahun pelajaran aktif
@@ -109,21 +123,58 @@
                             </a>
                         </li>
                     @endif
-                    <li class="nav-item">
-                        <a href="{{ route('rombel.index') }}" class="nav-link">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>
-                                Rombongan Belajar
-                            </p>
-                        </a>
-                    </li>
+                    @can('read-rombel')
+                        <li class="nav-item">
+                            <a href="{{ route('rombel.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>
+                                    Rombongan Belajar
+                                </p>
+                            </a>
+                        </li>
+                    @endcan
 
                     <li class="nav-header">MANAGEMEN PENGGUNA</li>
+                    {{--  <li class="nav-item">
+                    <a href="{{ route('users.index') }}" class="nav-link">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Managemen User</p>
+                    </a>
+                </li>  --}}
                     <li class="nav-item">
-                        <a href="{{ route('users.index') }}" class="nav-link">
+                        <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-users"></i>
                             <p>Managemen User</p>
                         </a>
+                        <ul class="nav nav-treeview" style="display: none">
+                            <li class="nav-item">
+                                <a href="{{ route('users.index') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>User</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('role.index') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Role</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('permission.index') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Permission</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('permissiongroups.index') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Group Permission</p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
                     <li class="nav-header">PENGATURAN</li>
