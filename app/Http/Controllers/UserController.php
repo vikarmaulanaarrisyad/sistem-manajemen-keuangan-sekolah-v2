@@ -19,7 +19,7 @@ class UserController extends Controller
 
     public function data()
     {
-        $query = User::role('guru')->orderBy('id', 'DESC')->get();
+        $query = User::orderBy('id', 'DESC')->get();
 
         return datatables($query)
             ->addIndexColumn()
