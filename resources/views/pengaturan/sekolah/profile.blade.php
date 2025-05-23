@@ -18,7 +18,7 @@
         @enderror
     </div>
     <div class="form-group">
-        <label for="nsm">NSM</label>
+        <label for="nsm">NSS</label>
         <input type="number" class="form-control @error('nsm') is-invalid @enderror" id="nsm" name="nsm"
             value="{{ old('nsm', $sekolah->nsm) }}" required>
         @error('nsm')

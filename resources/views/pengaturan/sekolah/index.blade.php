@@ -30,7 +30,7 @@
                 <div class="card-header p-2">
                     <ul class="nav nav-pills">
                         <li class="nav-item"><a class="nav-link active" href="#identitas" data-toggle="tab">Profile
-                                Madrasah</a>
+                                Sekolah</a>
                         </li>
                         {{--  <li class="nav-item"><a class="nav-link" href="#sambutan" data-toggle="tab">Sambutan Madrasah</a>
                         </li>

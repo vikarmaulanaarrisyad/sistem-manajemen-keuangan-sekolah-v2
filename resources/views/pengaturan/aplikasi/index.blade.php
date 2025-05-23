@@ -36,14 +36,14 @@
                         <label for="copyright">Copyright</label>
                         <input type="text" class="form-control @error('copyright') is-invalid @enderror" id="copyright"
                             name="copyright" value="{{ old('copyright', $aplikasi->copyright) }}" required>
-                        @error('nsm')
+                        @error('copyright')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
 
                     <!-- Other fields remain the same -->
-                    <div class="form-group">
+                    {{--  <div class="form-group">
                         <label for="logo_header">Logo Header</label>
                         <input type="file" class="form-control @error('logo') is-invalid @enderror" id="logo_header"
                             name="logo_header">
@@ -54,7 +54,7 @@
                         @error('logo_header')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                    </div>
+                    </div>  --}}
 
                     <!-- Other fields remain the same -->
                     <div class="form-group">

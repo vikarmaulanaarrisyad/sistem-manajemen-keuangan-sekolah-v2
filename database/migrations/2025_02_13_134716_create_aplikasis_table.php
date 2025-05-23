@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('singkatan');
             $table->string('copyright');
-            $table->string('logo_login')->nullable();
+            $table->string('logo_login')->default('logo_login.jpg');
             $table->timestamps();
         });
     }
