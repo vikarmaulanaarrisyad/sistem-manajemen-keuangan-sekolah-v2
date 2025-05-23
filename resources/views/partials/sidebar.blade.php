@@ -181,7 +181,7 @@
                     <li class="nav-item">
                         <a href="{{ route('sekolah.index') }}" class="nav-link">
                             <i class="nav-icon fas fa-school"></i>
-                            <p>Madrasah</p>
+                            <p>Sekolah</p>
                         </a>
                     </li>
                     <li class="nav-item">
