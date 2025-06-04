@@ -27,4 +27,65 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <x-card>
+                <div class="table-responsive">
+                    <table id="tabel-tabungan" class="table table-bordered table-striped w-100">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Uraian</th>
+                                <th>Pemasukan</th>
+                                <th>Pengeluaran</th>
+                                <th>Saldo</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+            </x-card>
+
+        </div>
+    </div>
 @endsection
+
+@include('includes.datatables')
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#tabel-tabungan').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: '{{ route('dashboard.siswa.tabungan') }}',
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex'
+                    },
+                    {
+                        data: 'tanggal',
+                        name: 'tanggal'
+                    },
+                    {
+                        data: 'uraian',
+                        name: 'uraian'
+                    },
+                    {
+                        data: 'pemasukan',
+                        name: 'pemasukan'
+                    },
+                    {
+                        data: 'pengeluaran',
+                        name: 'pengeluaran'
+                    },
+                    {
+                        data: 'saldo',
+                        name: 'saldo'
+                    },
+                ]
+            });
+        });
+    </script>
+@endpush

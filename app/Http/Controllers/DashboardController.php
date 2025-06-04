@@ -10,8 +10,10 @@ use App\Models\Siswa;
 use App\Models\TransaksiTabungan;
 use App\Models\TahunPelajaran;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class DashboardController extends Controller
 {
@@ -137,5 +139,48 @@ class DashboardController extends Controller
             'tahunPelajaran',
             'totalPengeluaran'
         ));
+    }
+
+    public function tabungan(Request $request)
+    {
+        $user = auth()->user();
+        $siswa = Siswa::where('user_id', $user->id)->first();
+
+        if (!$siswa) {
+            return response()->json(['error' => 'Data siswa tidak ditemukan.'], 404);
+        }
+
+        $query = TransaksiTabungan::where('siswa_id', $siswa->id)
+            ->orderBy('tanggal_transaksi', 'asc')
+            ->get();
+
+        $saldo = 0;
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn('tanggal', function ($q) {
+                return $q->tanggal_transaksi;
+            })
+            ->addColumn('uraian', function ($q) {
+                return $q->uraian;
+            })
+            ->addColumn('pemasukan', function ($q) {
+                return $q->jenis_transaksi === 'setor' ? number_format($q->jumlah, 0, ',', '.') : '';
+            })
+            ->addColumn('pengeluaran', function ($q) {
+                return $q->jenis_transaksi === 'tarik' ? number_format($q->jumlah, 0, ',', '.') : '';
+            })
+            ->addColumn('saldo', function ($q) use (&$saldo) {
+                // Update saldo per baris
+                if ($q->jenis_transaksi === 'setor') {
+                    $saldo += $q->jumlah;
+                } else {
+                    $saldo -= $q->jumlah;
+                }
+
+                return number_format($saldo, 0, ',', '.');
+            })
+            ->rawColumns(['pemasukan', 'pengeluaran', 'saldo'])
+            ->make(true);
     }
 }
