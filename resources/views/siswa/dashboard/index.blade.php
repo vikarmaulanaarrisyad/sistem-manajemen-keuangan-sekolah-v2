@@ -36,7 +36,6 @@
                             <tr>
                                 <th>No</th>
                                 <th>Tanggal</th>
-                                <th>Uraian</th>
                                 <th>Pemasukan</th>
                                 <th>Pengeluaran</th>
                                 <th>Saldo</th>
@@ -67,10 +66,6 @@
                     {
                         data: 'tanggal',
                         name: 'tanggal'
-                    },
-                    {
-                        data: 'uraian',
-                        name: 'uraian'
                     },
                     {
                         data: 'pemasukan',
