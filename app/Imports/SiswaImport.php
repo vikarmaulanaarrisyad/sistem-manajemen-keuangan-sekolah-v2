@@ -89,7 +89,7 @@ class SiswaImport implements ToModel, WithHeadingRow
                 'name' => $row['nama_lengkap'] ?? '',
                 'email' => $email,
                 'username' => $username,
-                'password' => Hash::make('password123'), // default password
+                'password' => Hash::make($nisn), // default password
             ]
         );
 

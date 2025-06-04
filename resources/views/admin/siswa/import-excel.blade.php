@@ -39,13 +39,12 @@
                     <!-- Progress Bar -->
                     <div class="progress mb-3 d-none" id="uploadProgress">
                         <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
-                            role="progressbar" style="width: 0%;" id="progressBar">
-                        </div>
+                            role="progressbar" style="width: 0%;" id="progressBar"></div>
                     </div>
 
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary shadow">
+                        <button type="submit" class="btn btn-primary shadow" id="uploadBtn">
                             <i class="fas fa-upload"></i> Upload
                         </button>
                     </div>
@@ -65,9 +64,17 @@
                 let progressBar = $("#progressBar");
                 let uploadProgress = $("#uploadProgress");
                 let fileInput = $("#excelFile");
+                let uploadBtn = $("#uploadBtn");
 
-                uploadProgress.removeClass("d-none"); // Tampilkan progress bar
+                // Tampilkan progress bar
+                uploadProgress.removeClass("d-none");
                 progressBar.css("width", "0%").removeClass("bg-success bg-danger");
+
+                // Disable tombol dan ubah teks jadi loading
+                uploadBtn.prop("disabled", true).html(`
+                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                Uploading...
+            `);
 
                 let formData = new FormData(form);
                 let xhr = new XMLHttpRequest();
@@ -93,6 +100,7 @@
                             location.reload();
                         });
                     } else {
+                        uploadBtn.prop("disabled", false).html('<i class="fas fa-upload"></i> Upload');
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops!',
@@ -101,14 +109,14 @@
                         }).then(() => {
                             progressBar.addClass("bg-danger");
                             progressBar.css("width", "0%").removeClass("bg-success bg-danger");
-                            uploadProgress.addClass("d-none"); // Sembunyikan progress bar
-                            fileInput.val(""); // Hapus file yang dipilih sebelumnya
+                            uploadProgress.addClass("d-none");
+                            fileInput.val("");
                         });
-
                     }
                 };
 
                 xhr.onerror = function() {
+                    uploadBtn.prop("disabled", false).html('<i class="fas fa-upload"></i> Upload');
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops!',
@@ -120,19 +128,21 @@
                 xhr.send(formData);
             });
 
-            // Reset form & progress bar saat modal ditutup
+            // Reset saat modal ditutup
             $("#importExcelModal").on("hidden.bs.modal", function() {
                 let form = $("#uploadForm")[0];
                 let fileInput = $("#excelFile");
                 let progressBar = $("#progressBar");
                 let uploadProgress = $("#uploadProgress");
+                let uploadBtn = $("#uploadBtn");
 
                 setTimeout(function() {
-                    form.reset(); // Reset form
-                    fileInput.val(""); // Hapus file yang dipilih sebelumnya
+                    form.reset();
+                    fileInput.val("");
                     progressBar.css("width", "0%").removeClass("bg-success bg-danger");
-                    uploadProgress.addClass("d-none"); // Sembunyikan progress bar
-                }, 300); // Pastikan reset setelah modal benar-benar tertutup
+                    uploadProgress.addClass("d-none");
+                    uploadBtn.prop("disabled", false).html('<i class="fas fa-upload"></i> Upload');
+                }, 300);
             });
         });
     </script>
