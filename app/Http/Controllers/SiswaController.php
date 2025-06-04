@@ -383,6 +383,7 @@ class SiswaController extends Controller
         }
 
         try {
+            ini_set('max_execution_time', 300); // 5 menit
             // Proses import menggunakan Laravel Excel
             Excel::import(new SiswaImport, $request->file('excelFile'), null, \Maatwebsite\Excel\Excel::XLSX);
 
