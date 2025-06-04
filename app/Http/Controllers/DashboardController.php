@@ -141,10 +141,12 @@ class DashboardController extends Controller
         ));
     }
 
-    public function tabungan(Request $request)
+    public function tabungan1(Request $request)
     {
         $user = auth()->user();
         $siswa = Siswa::where('user_id', $user->id)->first();
+
+        $bulan = $request->input('bulan');
 
         if (!$siswa) {
             return response()->json(['error' => 'Data siswa tidak ditemukan.'], 404);
@@ -182,5 +184,74 @@ class DashboardController extends Controller
             })
             ->rawColumns(['pemasukan', 'pengeluaran', 'saldo'])
             ->make(true);
+    }
+
+    public function tabungan(Request $request)
+    {
+        $user = auth()->user();
+        $siswa = Siswa::where('user_id', $user->id)->first();
+
+        $bulan = $request->input('bulan');
+
+        $query = TransaksiTabungan::where('siswa_id', $siswa->id)
+            ->when($bulan, fn($q) => $q->whereMonth('tanggal_transaksi', $bulan))
+            ->orderBy('tanggal_transaksi');
+
+        $saldo = 0;
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn('tanggal', fn($q) => $q->tanggal_transaksi)
+            ->addColumn('pemasukan', fn($q) => $q->jenis_transaksi === 'setor' ? 'Rp' . number_format($q->jumlah, 0, ',', '.') : '')
+            ->addColumn('pengeluaran', fn($q) => $q->jenis_transaksi === 'tarik' ? 'Rp' . number_format($q->jumlah, 0, ',', '.') : '')
+            ->addColumn('saldo', function ($q) use (&$saldo) {
+                $saldo += $q->jenis_transaksi === 'setor' ? $q->jumlah : -$q->jumlah;
+                return 'Rp' . number_format($saldo, 0, ',', '.');
+            })
+            ->rawColumns(['pemasukan', 'pengeluaran', 'saldo'])
+            ->make(true);
+    }
+
+    public function grafikSaldo()
+    {
+        $user = Auth::user();
+
+        if ($user->hasRole('siswa')) {
+            $siswa = Siswa::where('user_id', $user->id)->first();
+
+            if (!$siswa) {
+                return response()->json(['message' => 'Siswa tidak ditemukan'], 404);
+            }
+
+            $data = TransaksiTabungan::where('siswa_id', $siswa->id)
+                ->selectRaw("MONTH(tanggal_transaksi) as bulan,
+                        SUM(CASE WHEN jenis_transaksi = 'setor' THEN jumlah ELSE 0 END) as pemasukan,
+                        SUM(CASE WHEN jenis_transaksi = 'tarik' THEN jumlah ELSE 0 END) as pengeluaran")
+                ->groupByRaw("MONTH(tanggal_transaksi)")
+                ->orderByRaw("MONTH(tanggal_transaksi)")
+                ->get();
+
+            // Hitung saldo per bulan
+            $bulanList = range(1, now()->month);
+
+            $saldo = 0;
+            $grafik = [];
+
+            foreach ($bulanList as $bulan) {
+                $item = $data->firstWhere('bulan', $bulan);
+                $pemasukan = $item->pemasukan ?? 0;
+                $pengeluaran = $item->pengeluaran ?? 0;
+                $saldo += $pemasukan - $pengeluaran;
+
+                $grafik[] = [
+                    'bulan' => \Carbon\Carbon::create()->month($bulan)->locale('id')->monthName,
+                    'saldo' => $saldo
+                ];
+            }
+
+            return response()->json($grafik);
+        }
+
+        return response()->json(['message' => 'Akses ditolak'], 403);
     }
 }

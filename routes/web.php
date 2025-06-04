@@ -57,6 +57,8 @@ Route::get('/manifest.json', function () {
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard-siswa/tabungan', [DashboardController::class, 'tabungan'])->name('dashboard.siswa.tabungan');
+    Route::get('/dashboard/siswa/grafik-saldo', [DashboardController::class, 'grafikSaldo'])->name('dashboard.siswa.grafik-saldo');
+
 
 
     // Role Admin

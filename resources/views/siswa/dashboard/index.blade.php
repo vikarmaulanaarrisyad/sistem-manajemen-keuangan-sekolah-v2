@@ -27,9 +27,21 @@
             </div>
         </div>
     </div>
-    <div class="row">
+
+    <div class="row mt-4">
         <div class="col-lg-12">
             <x-card>
+                <ul class="nav nav-tabs mb-3" id="tab-bulan" role="tablist">
+                    @foreach (range(1, 12) as $bulan)
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ $bulan == now()->format('n') ? 'active' : '' }}" data-bs-toggle="tab"
+                                type="button" data-bulan="{{ $bulan }}">
+                                {{ \Carbon\Carbon::create()->month($bulan)->translatedFormat('F') }}
+                            </button>
+                        </li>
+                    @endforeach
+                </ul>
+
                 <div class="table-responsive">
                     <table id="tabel-tabungan" class="table table-bordered table-striped w-100">
                         <thead>
@@ -43,9 +55,17 @@
                         </thead>
                     </table>
                 </div>
-
             </x-card>
+        </div>
+    </div>
 
+
+    <div class="row my-4">
+        <div class="col-lg-12">
+            <x-card>
+                <h5>Grafik Saldo Bulanan</h5>
+                <canvas id="grafikSaldo" height="100"></canvas>
+            </x-card>
         </div>
     </div>
 @endsection
@@ -54,14 +74,25 @@
 
 @push('scripts')
     <script>
-        $(document).ready(function() {
+        let currentMonth = new Date().getMonth() + 1;
+
+        function loadDataTable(bulan) {
             $('#tabel-tabungan').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route('dashboard.siswa.tabungan') }}',
+                destroy: true,
+                responsive: true,
+                ajax: {
+                    url: '{{ route('dashboard.siswa.tabungan') }}',
+                    data: {
+                        bulan: bulan
+                    }
+                },
                 columns: [{
                         data: 'DT_RowIndex',
-                        name: 'DT_RowIndex'
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'tanggal',
@@ -80,6 +111,66 @@
                         name: 'saldo'
                     },
                 ]
+            });
+        }
+
+        $(document).ready(function() {
+            loadDataTable(currentMonth);
+
+            $('#tab-bulan .nav-link').on('click', function() {
+                $('#tab-bulan .nav-link').removeClass('active');
+                $(this).addClass('active');
+                let bulan = $(this).data('bulan');
+                loadDataTable(bulan);
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            $.get("{{ route('dashboard.siswa.grafik-saldo') }}", function(response) {
+                const labels = response.map(item => item.bulan);
+                const saldo = response.map(item => item.saldo);
+
+                const ctx = document.getElementById('grafikSaldo').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Saldo Bulanan',
+                            data: saldo,
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'Rp' + value.toLocaleString('id-ID');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
             });
         });
     </script>
