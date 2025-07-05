@@ -116,7 +116,7 @@ class SiswaController extends Controller
             'jumlah_saudara' => 'required',
             'anakke' => 'required',
             'alamat' => 'required',
-            'foto_siswa' => 'required|mimes:png, jpeg, jpg|max:3048',
+            'foto_siswa' => 'required|mimes:png,jpeg,jpg|max:3048',
         ];
 
         $message = [
@@ -149,9 +149,9 @@ class SiswaController extends Controller
 
             'alamat.required' => 'Alamat wajib diisi.',
 
-            'foto.required' => 'Foto wajib diunggah.',
-            'foto.mimes' => 'Foto harus dalam format PNG, JPEG, atau JPG.',
-            'foto.max' => 'Ukuran foto tidak boleh lebih dari 3MB.',
+            'foto_siswa.required' => 'Foto wajib diunggah.',
+            'foto_siswa.mimes' => 'Foto harus dalam format PNG, JPEG, atau JPG.',
+            'foto_siswa.max' => 'Ukuran foto tidak boleh lebih dari 3MB.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $message);
