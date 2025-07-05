@@ -164,9 +164,6 @@ class UserController extends Controller
         $siswa = Siswa::where('user_id', $user->id)->first();
         $guru = Guru::where('user_id', $user->id)->first();
 
-        // Hapus user dulu (opsional tergantung urutan constraint)
-        $user->delete();
-
         if ($siswa) {
             $siswa->delete();
         }
@@ -174,6 +171,10 @@ class UserController extends Controller
         if ($guru) {
             $guru->delete();
         }
+
+        // Hapus user dulu (opsional tergantung urutan constraint)
+        $user->delete();
+
 
         return response()->json([
             'message' => 'User berhasil dihapus'
