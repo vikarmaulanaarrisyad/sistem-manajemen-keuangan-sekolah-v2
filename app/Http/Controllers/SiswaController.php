@@ -14,6 +14,7 @@ use App\Models\Siswa;
 use App\Models\TahunPelajaran;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -101,7 +102,7 @@ class SiswaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store1(Request $request)
     {
         $rules = [
             'nisn' => 'required|min:10|numeric',
@@ -207,6 +208,101 @@ class SiswaController extends Controller
             'status' => 'success',
             'message' => 'Data berhasil disimpan'
         ], 201);
+    }
+
+    public function store(Request $request)
+    {
+        $rules = [
+            'nisn' => 'required|min:10|numeric|unique:siswa,nisn',
+            'nik' => 'required|min:16|numeric',
+            'nis' => 'required',
+            'kk' => 'required|min:16',
+            'nama_lengkap' => 'required',
+            'nama_panggilan' => 'required',
+            'jenis_kelamin_id' => 'required',
+            'tempat_lahir' => 'required',
+            'tgl_lahir' => 'required|date',
+            'agama_id' => 'required',
+            'kewarganegaraan_id' => 'required',
+            'jumlah_saudara' => 'required|numeric',
+            'anakke' => 'required|numeric',
+            'alamat' => 'required',
+            'foto_siswa' => 'required|mimes:png,jpeg,jpg|max:3048',
+        ];
+
+        $messages = [
+            // (sama seperti sebelumnya...)
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => 'error',
+                'errors'  => $validator->errors(),
+                'message' => 'Input tidak valid. Silakan periksa kembali.',
+            ], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Simpan user
+            $user = User::create([
+                'name' => $request->nama_lengkap,
+                'email' => $request->email ?? $request->nisn . '@gmail.com',
+                'username' => $request->nisn,
+                'password' => Hash::make($request->password),
+            ]);
+
+            // Tambahkan role siswa jika belum ada
+            if (!$user->hasRole('siswa')) {
+                $user->assignRole('siswa');
+            }
+
+            // Upload foto siswa
+            $fotoPath = upload('upload/siswa', $request->file('foto_siswa'), $request->nisn);
+
+            // Simpan data siswa
+            Siswa::create([
+                'user_id' => $user->id,
+                'nisn' => $request->nisn,
+                'nik' => $request->nik,
+                'nis' => $request->nis,
+                'kk' => $request->kk,
+                'nama_lengkap' => $request->nama_lengkap,
+                'nama_panggilan' => $request->nama_panggilan,
+                'jenis_kelamin_id' => $request->jenis_kelamin_id,
+                'agama_id' => $request->agama_id,
+                'tempat_lahir' => $request->tempat_lahir,
+                'tgl_lahir' => $request->tgl_lahir,
+                'kewarganegaraan_id' => $request->kewarganegaraan_id,
+                'jumlah_saudara' => $request->jumlah_saudara,
+                'anakke' => $request->anakke,
+                'alamat' => $request->alamat,
+                'foto' => $fotoPath,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data siswa dan akun berhasil disimpan.',
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
