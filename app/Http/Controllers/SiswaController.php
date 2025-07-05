@@ -12,7 +12,9 @@ use App\Models\Pendidikan;
 use App\Models\Rombel;
 use App\Models\Siswa;
 use App\Models\TahunPelajaran;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -165,7 +167,19 @@ class SiswaController extends Controller
         }
 
         $data = $request->except('foto_siswa', 'categories');
+
+        // Insert data to Users
+        $user = User::updateOrCreate(
+            ['username' => $request->nisn],
+            [
+                'name' => $request->nama_lengkap ?? '',
+                'email' => $request->nisn . '@gmail.com',
+                'username' => $request->nisn,
+                'password' => Hash::make($request->nisn), // default password
+            ]
+        );
         $data = [
+            'user_id' => $user->id,
             'nisn' => $request->nisn,
             'nik' => $request->nik,
             'nis' => $request->nis,
@@ -181,6 +195,11 @@ class SiswaController extends Controller
             'alamat' => $request->alamat,
             'foto' => upload('upload/siswa', $request->file('foto_siswa'), $request->nisn)
         ];
+
+        // Tambah role siswa jika belum
+        if (!$user->hasRole('siswa')) {
+            $user->assignRole('siswa');
+        }
 
         Siswa::create($data);
 
