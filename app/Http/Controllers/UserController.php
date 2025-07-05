@@ -160,13 +160,20 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::findOrfail($id);
+        $user = User::findOrFail($id);
         $siswa = Siswa::where('user_id', $user->id)->first();
         $guru = Guru::where('user_id', $user->id)->first();
 
+        // Hapus user dulu (opsional tergantung urutan constraint)
         $user->delete();
-        $siswa->delete();
-        $guru->delete();
+
+        if ($siswa) {
+            $siswa->delete();
+        }
+
+        if ($guru) {
+            $guru->delete();
+        }
 
         return response()->json([
             'message' => 'User berhasil dihapus'
