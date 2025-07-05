@@ -213,7 +213,7 @@ class SiswaController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'nisn' => 'required|min:10|numeric|unique:siswa,nisn',
+            'nisn' => 'required|min:10|numeric',
             'nik' => 'required|min:16|numeric',
             'nis' => 'required',
             'kk' => 'required|min:16',
@@ -256,7 +256,7 @@ class SiswaController extends Controller
             // Simpan user
             $user = User::create([
                 'name' => $request->nama_lengkap,
-                'email' => $request->email ?? $request->nisn . '@gmail.com',
+                'email' => $request->nisn . '@gmail.com',
                 'username' => $request->nisn,
                 'password' => Hash::make($request->password),
             ]);
