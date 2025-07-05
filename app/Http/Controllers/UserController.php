@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Guru;
+use App\Models\Siswa;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -130,6 +132,7 @@ class UserController extends Controller
             $data = [
                 'name' => $request->name,
                 'username' => $request->username,
+                'password' => Hash::make($request->password),
                 'email' => $request->email,
             ];
 
@@ -155,15 +158,15 @@ class UserController extends Controller
         }
     }
 
-    public function destroy(Request $request, User $users)
+    public function destroy($id)
     {
-        if ($users->id == Auth::user()->id) {
-            return response()->json([
-                'message' => 'Maaf, Anda tidak dapat menghapus diri sendiri'
-            ], 422);
-        }
+        $user = User::findOrfail($id);
+        $siswa = Siswa::where('user_id', $user->id)->first();
+        $guru = Guru::where('user_id', $user->id)->first();
 
-        $users->delete();
+        $user->delete();
+        $siswa->delete();
+        $guru->delete();
 
         return response()->json([
             'message' => 'User berhasil dihapus'
