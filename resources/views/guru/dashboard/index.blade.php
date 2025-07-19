@@ -60,12 +60,10 @@
 
     @can('read-keuangan-sekolah')
         <div class="row">
-            <div class="col-lg-6 col-6">
-                <!-- small box -->
+            <div class="col-lg-4 col-4">
                 <div class="small-box bg-success">
                     <div class="inner">
-                        <h3>Rp {{ format_uang($totalPemasukan) }}<sup style="font-size: 20px"></sup></h3>
-
+                        <h3>Rp {{ format_uang($totalPemasukan) }}</h3>
                         <p>Pemasukan Dana Bos Tahun Pelajaran {{ $tahunPelajaran->nama }} {{ $tahunPelajaran->semester->nama }}
                         </p>
                     </div>
@@ -75,12 +73,10 @@
                 </div>
             </div>
 
-            <div class="col-lg-6 col-6">
-                <!-- small box -->
+            <div class="col-lg-4 col-4">
                 <div class="small-box bg-danger">
                     <div class="inner">
                         <h3>Rp {{ format_uang($totalPengeluaran) }}</h3>
-
                         <p>Pengeluaran Dana Bos Tahun Pelajaran {{ $tahunPelajaran->nama }}
                             {{ $tahunPelajaran->semester->nama }}</p>
                     </div>
@@ -89,14 +85,25 @@
                     </div>
                 </div>
             </div>
-            <!-- ./col -->
+
+            {{-- Tambahan Sisa Saldo --}}
+            <div class="col-lg-4 col-4">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <h3>Rp {{ format_uang($saldoBOS) }}</h3>
+                        <p>Sisa Saldo Dana BOS Tahun Pelajaran {{ $tahunPelajaran->nama }}
+                            {{ $tahunPelajaran->semester->nama }}</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-cash"></i>
+                    </div>
+                </div>
+            </div>
         </div>
     @endcan
 
     @can('read-tabungan-siswa')
-        <!-- Grafik Tabungan Per Bulan dan Per Tahun -->
         <div class="row">
-            <!-- Card Grafik Tabungan Per Bulan -->
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -107,8 +114,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Card Grafik Tabungan Per Tahun -->
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -122,7 +127,7 @@
         </div>
 
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-12">
                 <x-card>
                     <x-slot name="header">
                         <h3 class="card-title">Daftar Saldo per Siswa</h3>
@@ -132,14 +137,19 @@
                             <tr>
                                 <th>No</th>
                                 <th>Nama Siswa</th>
+                                <th>Pemasukan</th>
+                                <th>Pengeluaran</th>
                                 <th>Saldo</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {{--  @dd($saldoPerSiswa)  --}}
                             @foreach ($saldoPerSiswa as $siswa)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $siswa->nama_lengkap }}</td>
+                                    <td>Rp {{ number_format($siswa->total_setor ?? 0, 0, ',', '.') }}</td>
+                                    <td>Rp {{ number_format($siswa->total_tarik ?? 0, 0, ',', '.') }}</td>
                                     <td>Rp {{ number_format($siswa->saldo ?? 0, 0, ',', '.') }}</td>
                                 </tr>
                             @endforeach
@@ -149,7 +159,6 @@
             </div>
         </div>
     @endcan
-
 @endsection
 
 @include('includes.datatables')
@@ -160,23 +169,14 @@
             $('#saldoPerSiswaTable').DataTable();
         });
     </script>
-    <!-- Script untuk Grafik -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Data Tabungan Per Bulan
         var tabunganPerBulan = @json($tabunganPerBulan);
-        var bulanLabels = tabunganPerBulan.map(function(item) {
-            return 'Bulan ' + item.bulan;
-        });
-        var totalSetorPerBulan = tabunganPerBulan.map(function(item) {
-            return item.total_setor;
-        });
-        var totalTarikPerBulan = tabunganPerBulan.map(function(item) {
-            return item.total_tarik;
-        });
+        var bulanLabels = tabunganPerBulan.map(item => 'Bulan ' + item.bulan);
+        var totalSetorPerBulan = tabunganPerBulan.map(item => item.total_setor);
+        var totalTarikPerBulan = tabunganPerBulan.map(item => item.total_tarik);
 
-        var ctx1 = document.getElementById('tabunganPerBulanChart').getContext('2d');
-        new Chart(ctx1, {
+        new Chart(document.getElementById('tabunganPerBulanChart'), {
             type: 'bar',
             data: {
                 labels: bulanLabels,
@@ -198,36 +198,28 @@
             }
         });
 
-        // Data Tabungan Per Tahun
         var tabunganPerTahun = @json($tabunganPerTahun);
-        var tahunLabels = tabunganPerTahun.map(function(item) {
-            return item.tahun;
-        });
-        var totalSetorPerTahun = tabunganPerTahun.map(function(item) {
-            return item.total_setor;
-        });
-        var totalTarikPerTahun = tabunganPerTahun.map(function(item) {
-            return item.total_tarik;
-        });
+        var tahunLabels = tabunganPerTahun.map(item => item.tahun);
+        var totalSetorPerTahun = tabunganPerTahun.map(item => item.total_setor);
+        var totalTarikPerTahun = tabunganPerTahun.map(item => item.total_tarik);
 
-        var ctx2 = document.getElementById('tabunganPerTahunChart').getContext('2d');
-        new Chart(ctx2, {
+        new Chart(document.getElementById('tabunganPerTahunChart'), {
             type: 'line',
             data: {
                 labels: tahunLabels,
                 datasets: [{
                         label: 'Setor Tunai',
                         data: totalSetorPerTahun,
-                        fill: false,
                         borderColor: 'rgba(54, 162, 235, 1)',
-                        tension: 0.1
+                        tension: 0.1,
+                        fill: false
                     },
                     {
                         label: 'Tarik Tunai',
                         data: totalTarikPerTahun,
-                        fill: false,
                         borderColor: 'rgba(255, 99, 132, 1)',
-                        tension: 0.1
+                        tension: 0.1,
+                        fill: false
                     }
                 ]
             }
