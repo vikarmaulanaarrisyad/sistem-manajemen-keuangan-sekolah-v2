@@ -134,6 +134,16 @@
                         </li>
                     @endcan
 
+                    <li class="nav-header">REPORT</li>
+                    <li class="nav-item">
+                        <a href="{{ route('laporan.tabungan.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-file-pdf"></i>
+                            <p>
+                                Laporan Tabungan
+                            </p>
+                        </a>
+                    </li>
+
                     <li class="nav-header">MANAGEMEN PENGGUNA</li>
                     {{--  <li class="nav-item">
                     <a href="{{ route('users.index') }}" class="nav-link">

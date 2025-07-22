@@ -7,6 +7,7 @@ use App\Http\Controllers\{
     KelasController,
     KenaikanSiswaController,
     KurikulumController,
+    LaporanTabunganController,
     PemasukanBosController,
     PengeluaranBosController,
     PermissionController,
@@ -152,6 +153,23 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/permissiongroups', 'store')->name('permissiongroups.store');
             Route::delete('/permissiongroups/{permissionGroup}/destroy', 'destroy')->name('permissiongroups.destroy');
         });
+
+        // Route::controller(LaporanTabunganController::class)->group(function () {
+        //     Route::get('/laporan/tabungan/data/{start}/{end}', 'data')->name('laporan.tabungan.data');
+        //     Route::get('/laporan/tabungan', 'index')->name('laporan.tabungan.index');
+        //     Route::get('/laporan/tabungan/{tabungan}/detail', 'detail')->name('laporan.tabungan.detail');
+        //     Route::get('/laporan/tabungan/{tabungan}', 'edit')->name('laporan.tabungan.edit');
+        //     Route::put('/laporan/tabungan/{tabungan}/update', 'update')->name('laporan.tabungan.update');
+        //     Route::post('/laporan/tabungan', 'store')->name('laporan.tabungan.store');
+        //     Route::delete('/laporan/{tabungan}/destroy', 'destroy')->name('laporan.tabungan.destroy');
+        // });
+
+        // Route::get('/laporan/tabungan/data', [LaporanTabunganController::class, 'data'])->name('laporan.tabungan.data');
+        Route::get('/laporan/tabungan', [LaporanTabunganController::class, 'index'])->name('laporan.tabungan.index');
+        Route::get('/laporan/tabungan/data', [LaporanTabunganController::class, 'data'])->name('laporan.tabungan.data');
+        Route::get('/laporan/tabungan/pdf/{start}/{end}', [LaporanTabunganController::class, 'exportPDF'])->name('laporan.tabungan.export_pdf');
+        Route::get('/get-rombels-by-kelas', [LaporanTabunganController::class, 'getRombels'])->name('get.rombels.by.kelas');
+        Route::get('/get-siswas-by-rombel', [LaporanTabunganController::class, 'getSiswas'])->name('get.siswas.by.rombel');
     });
 
     // Role Guru
