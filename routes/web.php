@@ -7,6 +7,7 @@ use App\Http\Controllers\{
     KelasController,
     KenaikanSiswaController,
     KurikulumController,
+    LaporanBosController,
     LaporanTabunganController,
     PemasukanBosController,
     PengeluaranBosController,
@@ -170,6 +171,10 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/laporan/tabungan/pdf/{start}/{end}', [LaporanTabunganController::class, 'exportPDF'])->name('laporan.tabungan.export_pdf');
         Route::get('/get-rombels-by-kelas', [LaporanTabunganController::class, 'getRombels'])->name('get.rombels.by.kelas');
         Route::get('/get-siswas-by-rombel', [LaporanTabunganController::class, 'getSiswas'])->name('get.siswas.by.rombel');
+
+        Route::get('/laporan/bos/data', [LaporanBosController::class, 'data'])->name('laporan.bos.data');
+        Route::get('/laporan/bos', [LaporanBosController::class, 'index'])->name('laporan.bos.index');
+        Route::get('/export-pdf/{start}/{end}', [LaporanBosController::class, 'exportPDF'])->name('laporan.bos.export_pdf');
     });
 
     // Role Guru

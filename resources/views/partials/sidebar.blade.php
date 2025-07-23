@@ -143,6 +143,14 @@
                             </p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('laporan.bos.index') }}" class="nav-link">
+                            <i class="nav-icon fas fa-file-pdf"></i>
+                            <p>
+                                Laporan Dana BOS
+                            </p>
+                        </a>
+                    </li>
 
                     <li class="nav-header">MANAGEMEN PENGGUNA</li>
                     {{--  <li class="nav-item">

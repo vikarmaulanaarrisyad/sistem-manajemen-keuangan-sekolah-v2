@@ -19,7 +19,7 @@ class LaporanTabunganController extends Controller
 
         $kelas = Kelas::all(); // Kirim semua kelas untuk dropdown
 
-        return view('laporan.index', compact('start', 'end', 'siswa_id', 'kelas'));
+        return view('laporan.tabungan.index', compact('start', 'end', 'siswa_id', 'kelas'));
     }
 
     public function data(Request $request)
